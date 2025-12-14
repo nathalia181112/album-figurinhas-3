@@ -1,129 +1,106 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Álbum de Figurinhas</title>
-
-  <style>
-    body {
-      margin: 0;
-      background-color: #f2f6fb;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-
-    h1 {
-      margin: 20px 0;
-    }
-
-    button {
-      background: #ff6f61;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      margin: 20px 0;
-    }
-
-    .pacote {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-bottom: 30px;
-      min-height: 140px;
-    }
-
-    .pacote img {
-      width: 120px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      opacity: 0;
-      transform: scale(0.5);
-      animation: aparecer 0.5s forwards;
-    }
-
-    @keyframes aparecer {
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .colecao {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 15px;
-      max-width: 900px;
-      margin: 0 auto 40px;
-    }
-
-    .colecao img {
-      width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    }
-
-    .album img {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum de Figurinhas</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  .album {
+    display: grid;
+    grid-template-columns: repeat(8, 100px);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .slot {
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border: 2px dashed #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ccc;
+  }
+  .figurinha {
+    width: 80px;
+    cursor: grab;
+  }
+  .figurinhas-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    max-width: 850px;
+  }
+</style>
 </head>
 <body>
 
-<h1>Álbum de Figurinhas</h1>
+<h1>Meu Álbum de Figurinhas</h1>
 
-<button onclick="abrirPacote()">🎁 Abrir Pacotinho</button>
+<div class="album" id="album"></div>
 
-<div class="pacote" id="pacote"></div>
-
-<h2>Minhas Figurinhas</h2>
-<div class="colecao" id="colecao"></div>
-
-<hr>
-
-<div class="album">
-  <img src="1 CAPA.png">
-  <img src="2 RAPUNZEL.png">
-  <img src="3 RAPUNZEL.png">
-  <img src="4 MACACÃO.png">
-  <img src="5 MACACÃO.png">
-  <img src="6 AMARELO.png">
-  <img src="7 AMARELO.png">
-  <img src="8 VERMELHO.png">
-  <img src="9 VERMELHO.png">
-  <img src="10 VINHO.png">
-  <img src="11 VINHO.png">
-  <img src="12 BRANCO.png">
-  <img src="13 BRANCO.png">
-  <img src="14 BOTÃO.png">
-</div>
+<h2>Figurinhas:</h2>
+<div class="figurinhas-container" id="figurinhasContainer"></div>
 
 <script>
-const colecao = new Set();
+const totalSlots = 48; // número de espaços no álbum
+const totalFigurinhas = 48; // número de figurinhas disponíveis
 
-function abrirPacote() {
-  const area = document.getElementById("pacote");
-  area.innerHTML = "";
+// Cria os slots do álbum
+const album = document.getElementById('album');
+for (let i = 1; i <= totalSlots; i++) {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.dataset.slotNumber = i; // adiciona número do slot
+  slot.innerText = i; // mostra o número no slot
+  slot.ondrop = drop;
+  slot.ondragover = allowDrop;
+  album.appendChild(slot);
+}
 
-  for (let i = 0; i < 5; i++) {
-    setTimeout(() => {
-      const numero = Math.floor(Math.random() * 48) + 1;
+// Cria as figurinhas automaticamente
+const figurinhasContainer = document.getElementById('figurinhasContainer');
+for (let i = 1; i <= totalFigurinhas; i++) {
+  const img = document.createElement('img');
+  img.src = `${i}.png`; // imagens nomeadas 1.png, 2.png...
+  img.id = `fig${i}`;
+  img.className = 'figurinha';
+  img.draggable = true;
+  img.dataset.figNumber = i; // adiciona número da figurinha
+  img.ondragstart = drag;
+  figurinhasContainer.appendChild(img);
+}
 
-      const img = document.createElement("img");
-      img.src = numero + ".png";
-      area.appendChild(img);
+// Funções de arrastar e soltar
+function allowDrop(ev) {
+  ev.preventDefault();
+}
 
-      if (!colecao.has(numero)) {
-        colecao.add(numero);
-        const imgColecao = document.createElement("img");
-        imgColecao.src = numero + ".png";
-        document.getElementById("colecao").appendChild(imgColecao);
-      }
-    }, i * 300);
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  const data = ev.dataTransfer.getData("text");
+  const figurinha = document.getElementById(data);
+  const slotNumber = ev.target.dataset.slotNumber;
+
+  if (figurinha.dataset.figNumber === slotNumber) {
+    ev.target.innerHTML = "";
+    ev.target.appendChild(figurinha);
+  } else {
+    alert(`Essa figurinha não pode ser colada aqui!`);
   }
 }
 </script>
