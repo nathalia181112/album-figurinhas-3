@@ -32,13 +32,38 @@
       justify-content: center;
       gap: 15px;
       flex-wrap: wrap;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
+      min-height: 140px;
     }
 
     .pacote img {
       width: 120px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: scale(0.5);
+      animation: aparecer 0.5s forwards;
+    }
+
+    @keyframes aparecer {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .colecao {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 15px;
+      max-width: 900px;
+      margin: 0 auto 40px;
+    }
+
+    .colecao img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     }
 
     .album img {
@@ -54,6 +79,9 @@
 <button onclick="abrirPacote()">🎁 Abrir Pacotinho</button>
 
 <div class="pacote" id="pacote"></div>
+
+<h2>Minhas Figurinhas</h2>
+<div class="colecao" id="colecao"></div>
 
 <hr>
 
@@ -75,15 +103,27 @@
 </div>
 
 <script>
+const colecao = new Set();
+
 function abrirPacote() {
   const area = document.getElementById("pacote");
   area.innerHTML = "";
 
   for (let i = 0; i < 5; i++) {
-    const numero = Math.floor(Math.random() * 48) + 1;
-    const img = document.createElement("img");
-    img.src = numero + ".png";
-    area.appendChild(img);
+    setTimeout(() => {
+      const numero = Math.floor(Math.random() * 48) + 1;
+
+      const img = document.createElement("img");
+      img.src = numero + ".png";
+      area.appendChild(img);
+
+      if (!colecao.has(numero)) {
+        colecao.add(numero);
+        const imgColecao = document.createElement("img");
+        imgColecao.src = numero + ".png";
+        document.getElementById("colecao").appendChild(imgColecao);
+      }
+    }, i * 300);
   }
 }
 </script>
