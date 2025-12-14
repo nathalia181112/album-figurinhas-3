@@ -16,9 +16,33 @@
       margin: 20px 0;
     }
 
-    .album {
-      max-width: 900px;
-      margin: auto;
+    button {
+      background: #ff6f61;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 20px 0;
+    }
+
+    button:hover {
+      background: #ff3b2e;
+    }
+
+    .pacote {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .pacote img {
+      width: 120px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
 
     .album img {
@@ -30,6 +54,12 @@
 <body>
 
 <h1>Álbum de Figurinhas</h1>
+
+<button onclick="abrirPacote()">🎁 Abrir Pacotinho</button>
+
+<div class="pacote" id="pacote"></div>
+
+<hr>
 
 <div class="album">
   <img src="1 CAPA.png">
@@ -47,6 +77,20 @@
   <img src="13 BRANCO.png">
   <img src="14 BOTÃO.png">
 </div>
+
+<script>
+function abrirPacote() {
+  const area = document.getElementById("pacote");
+  area.innerHTML = "";
+
+  for (let i = 0; i < 5; i++) {
+    const numero = Math.floor(Math.random() * 48) + 1;
+    const img = document.createElement("img");
+    img.src = numero + ".png";
+    area.appendChild(img);
+  }
+}
+</script>
 
 </body>
 </html>
