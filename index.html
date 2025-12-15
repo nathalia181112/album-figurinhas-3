@@ -6,69 +6,63 @@
 
   <style>
     body {
-      margin: 0;
-      background-color: #f2f6fb;
       font-family: Arial, sans-serif;
+      background: #f2f6fb;
       text-align: center;
     }
 
-    h1 {
-      margin: 20px 0;
-    }
-
     button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
       background: #ff6f61;
       color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 10px;
       cursor: pointer;
-      margin: 20px 0;
+      margin: 15px;
     }
 
-    .pacote {
+    .pacote, .colecao {
       display: flex;
-      justify-content: center;
-      gap: 15px;
       flex-wrap: wrap;
-      margin-bottom: 30px;
-      min-height: 140px;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px;
     }
 
-    .pacote img {
-      width: 120px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      opacity: 0;
-      transform: scale(0.5);
-      animation: aparecer 0.5s forwards;
+    .pacote img, .colecao img {
+      width: 80px;
+      cursor: pointer;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
-    @keyframes aparecer {
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .colecao {
+    .espacos {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 15px;
-      max-width: 900px;
-      margin: 0 auto 40px;
+      grid-template-columns: repeat(auto-fill, 90px);
+      gap: 10px;
+      justify-content: center;
+      margin: 30px;
     }
 
-    .colecao img {
-      width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    .espaco {
+      width: 80px;
+      height: 110px;
+      border: 2px dashed #aaa;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #888;
+      cursor: pointer;
+      background: white;
     }
 
-    .album img {
+    .espaco img {
       width: 100%;
-      margin-bottom: 20px;
+      height: 100%;
+      object-fit: cover;
     }
   </style>
 </head>
@@ -78,55 +72,31 @@
 
 <button onclick="abrirPacote()">🎁 Abrir Pacotinho</button>
 
+<h2>Pacote</h2>
 <div class="pacote" id="pacote"></div>
 
 <h2>Minhas Figurinhas</h2>
 <div class="colecao" id="colecao"></div>
 
-<hr>
-
-<div class="album">
-  <img src="1 CAPA.png">
-  <img src="2 RAPUNZEL.png">
-  <img src="3 RAPUNZEL.png">
-  <img src="4 MACACÃO.png">
-  <img src="5 MACACÃO.png">
-  <img src="6 AMARELO.png">
-  <img src="7 AMARELO.png">
-  <img src="8 VERMELHO.png">
-  <img src="9 VERMELHO.png">
-  <img src="10 VINHO.png">
-  <img src="11 VINHO.png">
-  <img src="12 BRANCO.png">
-  <img src="13 BRANCO.png">
-  <img src="14 BOTÃO.png">
-</div>
+<h2>Álbum</h2>
+<div class="espacos" id="espacos"></div>
 
 <script>
+let figurinhaSelecionada = null;
 const colecao = new Set();
 
 function abrirPacote() {
-  const area = document.getElementById("pacote");
-  area.innerHTML = "";
+  const pacote = document.getElementById("pacote");
+  pacote.innerHTML = "";
 
   for (let i = 0; i < 5; i++) {
-    setTimeout(() => {
-      const numero = Math.floor(Math.random() * 48) + 1;
+    const n = Math.floor(Math.random() * 48) + 1;
 
-      const img = document.createElement("img");
-      img.src = numero + ".png";
-      area.appendChild(img);
+    const img = document.createElement("img");
+    img.src = n + ".png";
+    img.onclick = () => selecionarFigurinha(n);
 
-      if (!colecao.has(numero)) {
-        colecao.add(numero);
-        const imgColecao = document.createElement("img");
-        imgColecao.src = numero + ".png";
-        document.getElementById("colecao").appendChild(imgColecao);
-      }
-    }, i * 300);
-  }
-}
-</script>
+    pacote.appendChild(img);
 
-</body>
-</html>
+    if (!colecao.has(n)) {
+      colecao.ad
