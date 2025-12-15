@@ -12,10 +12,6 @@ body {
   margin: 0;
 }
 
-h1 {
-  margin-top: 20px;
-}
-
 button {
   padding: 12px 24px;
   border-radius: 10px;
@@ -69,20 +65,116 @@ button {
   cursor: pointer;
 }
 
-/* ===== RESPONSIVO (CELULAR) ===== */
+/* ===== RESPONSIVO ===== */
 @media (max-width: 768px) {
-
   .fig img {
     width: 150px;
   }
-
   .pagina {
     width: 95%;
   }
-
   .slot {
     width: 120px;
     height: 120px;
   }
 }
 </style>
+</head>
+
+<body>
+
+<h1>Álbum de Figurinhas</h1>
+
+<button onclick="abrirPacote()">🎁 Abrir Pacotinho</button>
+
+<h2>Minhas Figurinhas</h2>
+<div id="colecao"></div>
+
+<hr>
+
+<div id="album"></div>
+
+<script>
+let figurinhaSelecionada = null;
+const colecao = new Set();
+
+/* ===== ABRIR PACOTE ===== */
+function abrirPacote() {
+  for (let i = 0; i < 5; i++) {
+    const n = Math.floor(Math.random() * 48) + 1;
+
+    if (!colecao.has(n)) {
+      colecao.add(n);
+
+      const fig = document.createElement("div");
+      fig.className = "fig";
+      fig.innerHTML = `
+        <span>${n}</span>
+        <img src="${n}.png">
+      `;
+
+      fig.onclick = () => figurinhaSelecionada = n;
+      document.getElementById("colecao").appendChild(fig);
+    }
+  }
+}
+
+/* ===== CRIAR PÁGINA ===== */
+function criarPagina(imagem, inicio) {
+  let html = `<div class="pagina"><img src="${imagem}">`;
+
+  const pos = [
+    [60, 80],
+    [60, 300],
+    [300, 80],
+    [300, 300]
+  ];
+
+  for (let i = 0; i < 4; i++) {
+    const num = inicio + i;
+    html += `
+      <div class="slot"
+        style="top:${pos[i][0]}px; left:${pos[i][1]}px"
+        onclick="colar(event, ${num})">
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+/* ===== COLAR ===== */
+function colar(e, numero) {
+  if (figurinhaSelecionada === numero) {
+    e.target.innerHTML = `<img src="${numero}.png" style="width:100%">`;
+    figurinhaSelecionada = null;
+  } else {
+    alert("Essa figurinha não pertence a esse espaço 💜");
+  }
+}
+
+/* ===== MONTAR ÁLBUM ===== */
+const album = document.getElementById("album");
+
+album.innerHTML += criarPagina("2 RAPUNZEL.png", 1);
+album.innerHTML += criarPagina("3 RAPUNZEL.png", 5);
+
+album.innerHTML += criarPagina("4 MACACÃO.png", 9);
+album.innerHTML += criarPagina("5 MACACÃO.png", 13);
+
+album.innerHTML += criarPagina("6 AMARELO.png", 17);
+album.innerHTML += criarPagina("7 AMARELO.png", 21);
+
+album.innerHTML += criarPagina("8 VERMELHO.png", 25);
+album.innerHTML += criarPagina("9 VERMELHO.png", 29);
+
+album.innerHTML += criarPagina("10 VINHO.png", 33);
+album.innerHTML += criarPagina("11 VINHO.png", 37);
+
+album.innerHTML += criarPagina("12 BRANCO.png", 41);
+album.innerHTML += criarPagina("13 BRANCO.png", 45);
+</script>
+
+</body>
+</html>
