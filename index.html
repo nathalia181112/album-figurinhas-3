@@ -22,6 +22,31 @@ button {
   margin: 15px;
 }
 
+/* ===== FIGURINHAS ===== */
+.fig {
+  position: relative;
+  display: inline-block;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.fig img {
+  width: 70px;
+  border-radius: 6px;
+}
+
+.fig span {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* ===== ÁLBUM ===== */
 .pagina {
   position: relative;
   width: 600px;
@@ -44,6 +69,7 @@ button {
 <body>
 
 <h1>Álbum de Figurinhas</h1>
+
 <button onclick="abrirPacote()">🎁 Abrir Pacotinho</button>
 
 <h2>Minhas Figurinhas</h2>
@@ -57,46 +83,63 @@ button {
 let figurinhaSelecionada = null;
 const colecao = new Set();
 
+/* ===== PACOTE ===== */
 function abrirPacote() {
   for (let i = 0; i < 5; i++) {
     const n = Math.floor(Math.random() * 48) + 1;
+
     if (!colecao.has(n)) {
       colecao.add(n);
-      const img = document.createElement("img");
-      img.src = n + ".png";
-      img.style.width = "70px";
-      img.onclick = () => figurinhaSelecionada = n;
-      document.getElementById("colecao").appendChild(img);
+
+      const fig = document.createElement("div");
+      fig.className = "fig";
+      fig.innerHTML = `
+        <span>${n}</span>
+        <img src="${n}.png">
+      `;
+
+      fig.onclick = () => figurinhaSelecionada = n;
+      document.getElementById("colecao").appendChild(fig);
     }
   }
 }
 
-function criarPagina(img, inicio) {
-  let html = `<div class="pagina"><img src="${img}">`;
-  let pos = [
-    [60,80],[60,300],[300,80],[300,300]
+/* ===== CRIAR PÁGINAS ===== */
+function criarPagina(imagem, inicio) {
+  let html = `<div class="pagina"><img src="${imagem}">`;
+
+  const pos = [
+    [60, 80],
+    [60, 300],
+    [300, 80],
+    [300, 300]
   ];
 
   for (let i = 0; i < 4; i++) {
-    let num = inicio + i;
-    html += `<div class="slot" 
-      style="top:${pos[i][0]}px;left:${pos[i][1]}px"
-      onclick="colar(event, ${num})"></div>`;
+    const num = inicio + i;
+    html += `
+      <div class="slot"
+        style="top:${pos[i][0]}px; left:${pos[i][1]}px"
+        onclick="colar(event, ${num})">
+      </div>
+    `;
   }
 
   html += `</div>`;
   return html;
 }
 
-function colar(e, n) {
-  if (figurinhaSelecionada === n) {
-    e.target.innerHTML = `<img src="${n}.png" style="width:100%">`;
+/* ===== COLAR ===== */
+function colar(e, numero) {
+  if (figurinhaSelecionada === numero) {
+    e.target.innerHTML = `<img src="${numero}.png" style="width:100%">`;
     figurinhaSelecionada = null;
   } else {
-    alert("Figurinha errada 💜");
+    alert("Essa figurinha não pertence a esse espaço 💜");
   }
 }
 
+/* ===== MONTAR ÁLBUM ===== */
 const album = document.getElementById("album");
 
 album.innerHTML += criarPagina("2 RAPUNZEL.png", 1);
