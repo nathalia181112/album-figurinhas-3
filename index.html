@@ -9,6 +9,11 @@
       font-family: Arial, sans-serif;
       background: #f2f6fb;
       text-align: center;
+      margin: 0;
+    }
+
+    h1 {
+      margin: 20px 0;
     }
 
     button {
@@ -55,8 +60,8 @@
       justify-content: center;
       font-weight: bold;
       color: #888;
-      cursor: pointer;
       background: white;
+      cursor: pointer;
     }
 
     .espaco img {
@@ -70,7 +75,7 @@
 
 <h1>Álbum de Figurinhas</h1>
 
-<button onclick="alert('FUNCIONOU 🎉')">🎁 Abrir Pacotinho</button>
+<button id="btnPacote">🎁 Abrir Pacotinho</button>
 
 <h2>Pacote</h2>
 <div class="pacote" id="pacote"></div>
@@ -85,6 +90,13 @@
 let figurinhaSelecionada = null;
 const colecao = new Set();
 
+window.onload = function () {
+
+  document.getElementById("btnPacote").addEventListener("click", abrirPacote);
+
+  criarEspacos();
+};
+
 function abrirPacote() {
   const pacote = document.getElementById("pacote");
   pacote.innerHTML = "";
@@ -94,9 +106,50 @@ function abrirPacote() {
 
     const img = document.createElement("img");
     img.src = n + ".png";
-    img.onclick = () => selecionarFigurinha(n);
+    img.onclick = function () {
+      selecionarFigurinha(n);
+    };
 
     pacote.appendChild(img);
 
     if (!colecao.has(n)) {
-      colecao.ad
+      colecao.add(n);
+      const imgColecao = document.createElement("img");
+      imgColecao.src = n + ".png";
+      imgColecao.onclick = function () {
+        selecionarFigurinha(n);
+      };
+      document.getElementById("colecao").appendChild(imgColecao);
+    }
+  }
+}
+
+function selecionarFigurinha(numero) {
+  figurinhaSelecionada = numero;
+  alert("Figurinha " + numero + " selecionada! Agora clique no espaço " + numero);
+}
+
+function criarEspacos() {
+  const espacos = document.getElementById("espacos");
+
+  for (let i = 1; i <= 48; i++) {
+    const div = document.createElement("div");
+    div.className = "espaco";
+    div.textContent = i;
+
+    div.onclick = function () {
+      if (figurinhaSelecionada === i) {
+        div.innerHTML = `<img src="${i}.png">`;
+        figurinhaSelecionada = null;
+      } else if (figurinhaSelecionada !== null) {
+        alert("Essa figurinha não pertence a este espaço 😅");
+      }
+    };
+
+    espacos.appendChild(div);
+  }
+}
+</script>
+
+</body>
+</html>
