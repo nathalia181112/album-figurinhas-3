@@ -1,217 +1,182 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <title>Álbum de Figurinhas</title>
 
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #f2f6fb;
-  text-align: center;
   margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f6fa;
 }
 
-/* LOGIN */
-#login {
-  margin-top: 100px;
+header {
+  text-align: center;
+  padding: 20px;
 }
 
-input {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-/* BOTÃO */
 button {
-  padding: 12px 24px;
-  border-radius: 10px;
-  border: none;
   background: #ff6f61;
   color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
   font-size: 16px;
   cursor: pointer;
-  margin: 15px;
 }
 
-/* FIGURINHAS */
-.fig {
-  position: relative;
-  display: inline-block;
-  margin: 8px;
-  cursor: pointer;
+h2 {
+  margin: 20px;
 }
 
-.fig img {
-  width: 110px;
+/* ===== ÁREA DAS FIGURINHAS ===== */
+#figurinhas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 20px;
+}
+
+.figurinha {
+  width: 120px;
+  text-align: center;
+  cursor: grab;
+}
+
+.figurinha img {
+  width: 100%;
   border-radius: 10px;
 }
 
-.fig span {
-  position: absolute;
-  top: 5px;
-  left: 6px;
-  background: rgba(0,0,0,0.75);
-  color: white;
-  font-size: 14px;
-  padding: 3px 7px;
-  border-radius: 12px;
+.numero {
+  font-weight: bold;
+  margin-top: 5px;
 }
 
-/* ÁLBUM */
-.pagina {
-  position: relative;
-  width: 600px;
-  margin: 40px auto;
-}
-
-.pagina img {
+/* ===== ÁLBUM ===== */
+.album {
+  background: url("ALBUM.png") no-repeat center;
+  background-size: cover;
   width: 100%;
+  max-width: 900px;
+  aspect-ratio: 1 / 1;
+  margin: 30px auto;
+  position: relative;
 }
 
+/* ===== ESPAÇOS ===== */
 .slot {
+  width: 150px;
+  height: 150px;
   position: absolute;
-  width: 140px;
-  height: 140px;
-  cursor: pointer;
+  border-radius: 6px;
 }
 
-/* RESPONSIVO */
-@media (max-width: 768px) {
-  .fig img {
-    width: 150px;
-  }
-  .pagina {
-    width: 95%;
-  }
-  .slot {
-    width: 120px;
-    height: 120px;
-  }
+.slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-  <h1>Meu Álbum de Figurinhas</h1>
-  <p>Digite seu nome:</p>
-  <input id="nome">
-  <br>
-  <button onclick="entrar()">Entrar</button>
-</div>
-
-<!-- APP -->
-<div id="app" style="display:none">
-
-<h1 id="titulo"></h1>
-
-<button onclick="abrirPacote()">🎁 Abrir Pacotinho</button>
+<header>
+  <h1>Álbum de Figurinhas</h1>
+  <button onclick="abrirPacotinho()">🎁 Abrir Pacotinho</button>
+</header>
 
 <h2>Minhas Figurinhas</h2>
-<div id="colecao"></div>
+<div id="figurinhas"></div>
 
-<hr>
-
-<div id="album"></div>
-
-</div>
+<h2>Álbum</h2>
+<div class="album" id="album"></div>
 
 <script>
-let usuario = "";
-let figurinhaSelecionada = null;
-let colecao = new Set();
-let coladas = {};
+/* ===== POSIÇÕES DOS QUADRADOS (AJUSTADAS) ===== */
+const posicoes = [
+  [70, 90],     // cima esquerda
+  [70, 250],    // cima direita
+  [310, 90],    // baixo esquerda
+  [310, 250]    // baixo direita
+];
 
-function entrar() {
-  usuario = document.getElementById("nome").value.trim();
-  if (!usuario) return alert("Digite um nome");
+/* ===== CONFIGURAÇÃO DAS PÁGINAS ===== */
+const paginas = [
+  { fundo: "2 RAPUNZEL.png", inicio: 1 },
+  { fundo: "3 RAPUNZEL.png", inicio: 5 },
+  { fundo: "4 MACACÃO.png", inicio: 9 },
+  { fundo: "5 MACACÃO.png", inicio: 13 },
+  { fundo: "6 AMARELO.png", inicio: 17 },
+  { fundo: "7 AMARELO.png", inicio: 21 },
+  { fundo: "8 VERMELHO.png", inicio: 25 },
+  { fundo: "9 VERMELHO.png", inicio: 29 },
+  { fundo: "10 VINHO.png", inicio: 33 },
+  { fundo: "11 VINHO.png", inicio: 37 },
+  { fundo: "12 BRANCO.png", inicio: 41 },
+  { fundo: "13 BRANCO.png", inicio: 45 }
+];
 
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
-  document.getElementById("titulo").innerText = "Álbum de " + usuario;
+const album = document.getElementById("album");
+const areaFigurinhas = document.getElementById("figurinhas");
 
-  carregar();
-  montarAlbum();
-}
-
-function salvar() {
-  localStorage.setItem("colecao_" + usuario, JSON.stringify([...colecao]));
-  localStorage.setItem("coladas_" + usuario, JSON.stringify(coladas));
-}
-
-function carregar() {
-  const c = JSON.parse(localStorage.getItem("colecao_" + usuario) || "[]");
-  const k = JSON.parse(localStorage.getItem("coladas_" + usuario) || "{}");
-
-  colecao = new Set(c);
-  coladas = k;
-
-  colecao.forEach(n => criarFigurinha(n));
-}
-
-function abrirPacote() {
-  for (let i = 0; i < 5; i++) {
-    const n = Math.floor(Math.random() * 48) + 1;
-    if (!colecao.has(n)) {
-      colecao.add(n);
-      criarFigurinha(n);
-    }
-  }
-  salvar();
-}
-
-function criarFigurinha(n) {
-  const fig = document.createElement("div");
-  fig.className = "fig";
-  fig.innerHTML = `<span>${n}</span><img src="${n}.png">`;
-  fig.onclick = () => figurinhaSelecionada = n;
-  document.getElementById("colecao").appendChild(fig);
-}
-
-function criarPagina(imagem, inicio) {
-  let html = `<div class="pagina"><img src="${imagem}">`;
-  const pos = [[60,80],[60,300],[300,80],[300,300]];
+/* ===== CRIA O ÁLBUM ===== */
+paginas.forEach(p => {
+  const pagina = document.createElement("div");
+  pagina.style.background = `url(${p.fundo}) center/cover`;
+  pagina.style.position = "relative";
+  pagina.style.width = "100%";
+  pagina.style.height = "100%";
 
   for (let i = 0; i < 4; i++) {
-    const n = inicio + i;
-    const img = coladas[n] ? `<img src="${n}.png" style="width:100%">` : "";
-    html += `
-      <div class="slot"
-      style="top:${pos[i][0]}px;left:${pos[i][1]}px"
-      onclick="colar(event,${n})">${img}</div>`;
-  }
-  return html + "</div>";
-}
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.dataset.numero = p.inicio + i;
 
-function colar(e, n) {
-  if (figurinhaSelecionada === n && !coladas[n]) {
-    e.target.innerHTML = `<img src="${n}.png" style="width:100%">`;
-    coladas[n] = true;
-    figurinhaSelecionada = null;
-    salvar();
-  }
-}
+    slot.style.top = posicoes[i][0] + "px";
+    slot.style.left = posicoes[i][1] + "px";
 
-function montarAlbum() {
-  const a = document.getElementById("album");
-  a.innerHTML = "";
-  a.innerHTML += criarPagina("2 RAPUNZEL.png",1);
-  a.innerHTML += criarPagina("3 RAPUNZEL.png",5);
-  a.innerHTML += criarPagina("4 MACACÃO.png",9);
-  a.innerHTML += criarPagina("5 MACACÃO.png",13);
-  a.innerHTML += criarPagina("6 AMARELO.png",17);
-  a.innerHTML += criarPagina("7 AMARELO.png",21);
-  a.innerHTML += criarPagina("8 VERMELHO.png",25);
-  a.innerHTML += criarPagina("9 VERMELHO.png",29);
-  a.innerHTML += criarPagina("10 VINHO.png",33);
-  a.innerHTML += criarPagina("11 VINHO.png",37);
-  a.innerHTML += criarPagina("12 BRANCO.png",41);
-  a.innerHTML += criarPagina("13 BRANCO.png",45);
+    slot.ondragover = e => e.preventDefault();
+    slot.ondrop = e => {
+      e.preventDefault();
+      const num = e.dataTransfer.getData("numero");
+      if (num == slot.dataset.numero) {
+        const img = document.createElement("img");
+        img.src = `${num}.png`;
+        slot.appendChild(img);
+      }
+    };
+
+    pagina.appendChild(slot);
+  }
+
+  album.appendChild(pagina);
+});
+
+/* ===== ABRIR PACOTINHO ===== */
+function abrirPacotinho() {
+  areaFigurinhas.innerHTML = "";
+
+  for (let i = 0; i < 5; i++) {
+    const numero = Math.floor(Math.random() * 48) + 1;
+
+    const fig = document.createElement("div");
+    fig.className = "figurinha";
+    fig.draggable = true;
+
+    fig.ondragstart = e => {
+      e.dataTransfer.setData("numero", numero);
+    };
+
+    fig.innerHTML = `
+      <img src="${numero}.png">
+      <div class="numero">Figurinha ${numero}</div>
+    `;
+
+    areaFigurinhas.appendChild(fig);
+  }
 }
 </script>
 
